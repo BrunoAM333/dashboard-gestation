@@ -421,9 +421,25 @@ new Chart(document.getElementById("c-donut"),{
 
 new Chart(document.getElementById("c-motivos"),{
   type:"bar",
-  data:{labels:motL,datasets:[{label:"Embriões",data:motV,borderRadius:3,
-    backgroundColor: motL.map(l => l.includes("Sucesso") ? C_SUC : l.includes("Insucesso") ? C_INS : l.includes("Não transferido") ? C_NAO_TRANSF : l.includes("Não classificado") ? C_NAO_CLASS : l.includes("Sem dados") ? C_SEM_DADOS : "#ccc")
-  options:{...bOpts("y"),plugins:{legend:{display:false}}}
+  data:{
+    labels: motL,
+    datasets:[{
+      label:"Embriões",
+      data: motV,
+      borderRadius:3,
+      backgroundColor: motL.map(l =>
+        l.includes("Sucesso") ? C_SUC :
+        l.includes("Insucesso") ? C_INS :
+        l.includes("Não transferido") ? C_NAO_TRANSF :
+        l.includes("Não classificado") ? C_NAO_CLASS :
+        l.includes("Sem dados") ? C_SEM_DADOS : "#ccc"
+      )
+    }]
+  },
+  options:{
+    ...bOpts("y"),
+    plugins:{legend:{display:false}}
+  }
 });
 
 // S2
