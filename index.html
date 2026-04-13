@@ -66,6 +66,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
 .met h3{font-size:12px;font-weight:600;margin:1rem 0 .3rem}
 .met p,.met li{font-size:12px;color:#3a3a38;line-height:1.7}
 .met ul{padding-left:1.1rem}
+/* glossário */
+.glos-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:.75rem;margin-top:.75rem}
+.glos-item{display:flex;gap:10px;align-items:flex-start;padding:.7rem .9rem;
+            border-radius:8px;border:1px solid var(--border);background:var(--card)}
+.glos-dot{width:14px;height:14px;border-radius:50%;flex-shrink:0;margin-top:2px}
+.glos-title{font-size:12px;font-weight:600;margin-bottom:2px}
+.glos-desc{font-size:11px;color:var(--muted);line-height:1.55}
 section{scroll-margin-top:1rem}
 </style>
 </head>
@@ -84,6 +91,7 @@ section{scroll-margin-top:1rem}
   <a href="#s3">3 · Morfocinética</a>
   <a href="#s4">4 · Morfologia embrionária</a>
   <a href="#s5">5 · Metodologia</a>
+  <a href="#s6">6 · Glossário</a>
 </nav>
 
 <!-- ══ S1 ══ -->
@@ -349,10 +357,68 @@ section{scroll-margin-top:1rem}
 </div>
 </section>
 
+<!-- ══ S6 — GLOSSÁRIO ══ -->
+<section id="s6">
+<div class="sec-lbl">6 · Glossário — categorias de classificação</div>
+<div class="met">
+  <h2>O que significa cada categoria</h2>
+  <p style="margin-bottom:.5rem">Cada embrião do banco de dados recebe uma das cinco classificações abaixo, com base nas colunas de desfecho clínico.</p>
+</div>
+
+<div class="glos-grid" style="margin-top:.875rem">
+
+  <div class="glos-item">
+    <div class="glos-dot" style="background:#0f6e56"></div>
+    <div>
+      <div class="glos-title" style="color:#0f6e56">Sucesso gestacional</div>
+      <div class="glos-desc">O embrião foi transferido e gerou alguma forma de gestação confirmada — clínica, química ou parto. Inclui gestação bioquímica (β-hCG positivo), gestação clínica (batimento cardíaco fetal), parto e perdas gestacionais (miscarriage), pois todas representam implantação confirmada.</div>
+    </div>
+  </div>
+
+  <div class="glos-item">
+    <div class="glos-dot" style="background:#993c1d"></div>
+    <div>
+      <div class="glos-title" style="color:#993c1d">Insucesso gestacional</div>
+      <div class="glos-desc">O embrião foi transferido, mas não houve implantação detectável. Corresponde a resultados como β-hCG negativo, "Não engravidou" ou "No pregnancy" sem qualquer sinal de gestação associado nas demais colunas.</div>
+    </div>
+  </div>
+
+  <div class="glos-item">
+    <div class="glos-dot" style="background:#4a6fa5"></div>
+    <div>
+      <div class="glos-title" style="color:#4a6fa5">Não transferido</div>
+      <div class="glos-desc">O embrião não foi transferido naquele ciclo. Pode ter sido criopreservado para uso futuro (TERCEIRA VIA, Total Cryopreservation), descartado por falha de desenvolvimento (DUE TO ABNORMAL), ou o ciclo foi encerrado antes da transferência (FIV COMPLETA/INCOMPLETA). Esses embriões são excluídos da análise de taxa de sucesso.</div>
+    </div>
+  </div>
+
+  <div class="glos-item">
+    <div class="glos-dot" style="background:#b4a28a"></div>
+    <div>
+      <div class="glos-title" style="color:#6b6960">Sem dados</div>
+      <div class="glos-desc">Todas as seis colunas de desfecho estão vazias para este embrião. Pode indicar registros incompletos no sistema de origem, embriões de ciclos ainda em andamento no momento da extração, ou ausência de seguimento clínico documentado.</div>
+    </div>
+  </div>
+
+  <div class="glos-item">
+    <div class="glos-dot" style="background:#ba7517"></div>
+    <div>
+      <div class="glos-title" style="color:#ba7517">Não classificado (revisar)</div>
+      <div class="glos-desc">O embrião possui dados nas colunas de desfecho, mas nenhum padrão de classificação automática foi capaz de determinar o resultado com segurança. Inclui combinações ambíguas, variações textuais não mapeadas ou registros com informações contraditórias entre colunas. Estes casos devem ser revisados manualmente.</div>
+    </div>
+  </div>
+
+</div>
+</section>
+
 </div>
 <script>
 const D = {"total_base": 30930, "total_transf": 3380, "n_suc": 1321, "n_ins": 2059, "n_nao_transf": 18050, "n_sem_dados": 7235, "pct_suc": 39.1, "pct_ins": 60.9, "taxa_geral": 39.1, "motivos": {"Não transferido": 18050, "Sem dados": 7235, "Não classificado (revisar)": 2265, "Insucesso gestacional": 2059, "Sucesso gestacional": 1321}, "unid_cross": [{"cat": "Ibirapuera", "total": 1427, "suc": 476, "ins": 951}, {"cat": "Vila Mariana", "total": 976, "suc": 448, "ins": 528}, {"cat": "Brasilia", "total": 646, "suc": 251, "ins": 395}, {"cat": "Belo Horizonte", "total": 331, "suc": 146, "ins": 185}], "diag_cross": [{"cat": "Insuficiência ovariana", "total": 867, "suc": 258, "ins": 609}, {"cat": "Endometriose", "total": 558, "suc": 212, "ins": 346}, {"cat": "Fator masculino", "total": 476, "suc": 193, "ins": 283}, {"cat": "Outros", "total": 430, "suc": 189, "ins": 241}, {"cat": "Fator feminino anatômico", "total": 366, "suc": 111, "ins": 255}, {"cat": "Inexplicado", "total": 192, "suc": 80, "ins": 112}, {"cat": "Fator feminino endócrino", "total": 69, "suc": 35, "ins": 34}], "src_cross": [{"cat": "Homólogo", "total": 2205, "suc": 962, "ins": 1243}, {"cat": "Heterólogo", "total": 1174, "suc": 358, "ins": 816}, {"cat": "Ambos", "total": 1, "suc": 1, "ins": 0}], "hist_cross": [{"cat": "Fresco", "total": 2173, "suc": 1031, "ins": 1142}, {"cat": "Descongelado", "total": 1203, "suc": 286, "ins": 917}], "age_bins_lbl": [0.0, 5.1, 10.2, 15.2, 20.3, 25.4, 30.5, 35.6, 40.6, 45.7, 50.8, 55.9, 61.0, 66.0], "age_bins_suc": [5, 0, 0, 1, 0, 17, 127, 386, 502, 225, 42, 8, 3, 1], "age_bins_ins": [3, 0, 0, 0, 2, 47, 339, 785, 613, 228, 22, 14, 0, 3], "age_desc": {"sucesso": {"n": 1317, "media": 38.59, "dp": 5.33, "med": 38.51, "mn": 0.0, "mx": 65.86}, "insucesso": {"n": 2056, "media": 39.88, "dp": 5.37, "med": 39.43, "mn": 0.0, "mx": 71.13}}, "bmi_bins_lbl": [15.9, 19.5, 23.2, 26.8, 30.4, 34.1, 37.7, 41.3, 45.0, 48.6, 52.2, 55.9], "bmi_bins_suc": [55, 373, 303, 120, 36, 12, 4, 0, 0, 0, 0, 1], "bmi_bins_ins": [56, 242, 341, 377, 205, 160, 109, 54, 33, 15, 5, 8], "bmi_desc": {"sucesso": {"n": 904, "media": 23.84, "dp": 3.84, "med": 23.44, "mn": 15.88, "mx": 59.52}, "insucesso": {"n": 1605, "media": 24.05, "dp": 3.79, "med": 23.44, "mn": 16.89, "mx": 39.9}}, "prev_suc_vc": {"0": 1098, "1": 126, "2": 54, "4": 21, "3": 15, "5": 3, "6": 3, "7": 1}, "prev_ins_vc": {"0": 1488, "1": 325, "2": 113, "3": 75, "4": 24, "6": 10, "5": 9, "7": 6, "8": 3, "13": 2, "11": 2, "9": 1, "12": 1}, "asp_bins_lbl": [1.0, 7.2, 13.5, 19.8, 26.0, 32.2, 38.5, 44.8, 51.0, 57.2, 63.5, 69.8], "asp_bins_suc": [200, 615, 231, 120, 55, 21, 13, 1, 1, 0, 0, 2], "asp_bins_ins": [151, 539, 538, 213, 130, 61, 27, 7, 15, 13, 0, 3], "asp_desc": {"sucesso": {"n": 1259, "media": 13.5, "dp": 7.86, "med": 11.0, "mn": 1.0, "mx": 76.0}, "insucesso": {"n": 1697, "media": 11.94, "dp": 6.57, "med": 10.0, "mn": 1.0, "mx": 51.0}}, "morf_data": {"t2": {"suc_media": 26.0, "ins_media": 26.87, "suc_dp": 3.11, "ins_dp": 4.49, "suc_n": 1284, "ins_n": 1736}, "t3": {"suc_media": 36.65, "ins_media": 37.13, "suc_dp": 4.25, "ins_dp": 5.54, "suc_n": 1268, "ins_n": 1676}, "t4": {"suc_media": 38.07, "ins_media": 39.08, "suc_dp": 4.3, "ins_dp": 6.13, "suc_n": 1285, "ins_n": 1688}, "t5": {"suc_media": 49.45, "ins_media": 50.14, "suc_dp": 6.41, "ins_dp": 8.05, "suc_n": 1278, "ins_n": 1656}, "t8": {"suc_media": 57.9, "ins_media": 59.74, "suc_dp": 8.99, "ins_dp": 10.64, "suc_n": 1273, "ins_n": 1594}, "tB": {"suc_media": 104.59, "ins_media": 107.92, "suc_dp": 9.71, "ins_dp": 11.28, "suc_n": 1250, "ins_n": 1454}, "tEB": {"suc_media": 111.59, "ins_media": 115.04, "suc_dp": 9.48, "ins_dp": 11.32, "suc_n": 681, "ins_n": 690}, "tHB": {"suc_media": 115.65, "ins_media": 118.61, "suc_dp": 9.76, "ins_dp": 11.52, "suc_n": 441, "ins_n": 373}, "tM": {"suc_media": 88.99, "ins_media": 91.83, "suc_dp": 8.86, "ins_dp": 10.18, "suc_n": 412, "ins_n": 521}, "tPNa": {"suc_media": 7.45, "ins_media": 7.69, "suc_dp": 2.14, "ins_dp": 2.07, "suc_n": 418, "ins_n": 548}, "tPNf": {"suc_media": 23.53, "ins_media": 24.39, "suc_dp": 3.02, "ins_dp": 4.26, "suc_n": 1280, "ins_n": 1768}, "tSB": {"suc_media": 95.21, "ins_media": 98.01, "suc_dp": 8.52, "ins_dp": 9.76, "suc_n": 1253, "ins_n": 1492}, "tSC": {"suc_media": 78.54, "ins_media": 81.2, "suc_dp": 8.84, "ins_dp": 10.64, "suc_n": 413, "ins_n": 527}}, "morf_cols": ["t2", "t3", "t4", "t5", "t8", "tB", "tEB", "tHB", "tM", "tPNa", "tPNf", "tSB", "tSC"], "icm_cross": [{"cat": "A", "total": 1792, "suc": 921, "ins": 871}, {"cat": "B", "total": 749, "suc": 283, "ins": 466}, {"cat": "C", "total": 121, "suc": 31, "ins": 90}], "te_cross": [{"cat": "A", "total": 1420, "suc": 764, "ins": 656}, {"cat": "B", "total": 942, "suc": 377, "ins": 565}, {"cat": "C", "total": 299, "suc": 93, "ins": 206}], "frag2_cross": [{"cat": "0-10%", "total": 1009, "suc": 520, "ins": 489}, {"cat": "10-20%", "total": 319, "suc": 143, "ins": 176}, {"cat": "20-50%", "total": 66, "suc": 27, "ins": 39}, {"cat": "50-100%", "total": 3, "suc": 0, "ins": 3}], "pn_cross": [{"cat": "2.0", "total": 3116, "suc": 1298, "ins": 1818}, {"cat": "1.0", "total": 21, "suc": 1, "ins": 20}, {"cat": "0.0", "total": 19, "suc": 5, "ins": 14}, {"cat": "3.0", "total": 15, "suc": 1, "ins": 14}, {"cat": "4.0", "total": 3, "suc": 1, "ins": 2}], "frag_desc": {"sucesso": {"n": 385, "media": 27.97, "dp": 4.32, "med": 27.1, "mn": 20.0, "mx": 44.4}, "insucesso": {"n": 513, "media": 28.04, "dp": 5.13, "med": 26.9, "mn": 19.8, "mx": 74.9}}};
-const C_SUC="#0f6e56", C_INS="#993c1d", C_BLUE="#185fa5", C_AMB="#854f0b";
+
+const C_SUC        = "#0f6e56";
+const C_INS        = "#993c1d";
+const C_NAO_TRANSF = "#4a6fa5";
+const C_SEM_DADOS  = "#b4a28a";
+const C_NAO_CLASS  = "#ba7517";
 
 document.getElementById("kv-tot").textContent    = D.total_base.toLocaleString("pt-BR");
 document.getElementById("kv-transf").textContent = D.total_transf.toLocaleString("pt-BR");
@@ -362,11 +428,18 @@ document.getElementById("ks-suc").textContent    = D.pct_suc+"% dos transferidos
 document.getElementById("kv-ins").textContent    = D.n_ins.toLocaleString("pt-BR");
 document.getElementById("ks-ins").textContent    = D.pct_ins+"% dos transferidos";
 
-// Arco SVG
 document.getElementById("tv-geral").textContent = D.taxa_geral+"%";
 const circ = 2 * Math.PI * 15.9;
 document.getElementById("arc-geral").style.strokeDasharray =
   `${(D.taxa_geral/100*circ).toFixed(1)} ${circ.toFixed(1)}`;
+
+function colorMotivo(l){
+  if(l.includes("Sucesso gestacional")) return C_SUC;
+  if(l.includes("Insucesso"))           return C_INS;
+  if(l.includes("Não transferido"))     return C_NAO_TRANSF;
+  if(l.includes("Sem dados"))           return C_SEM_DADOS;
+  return C_NAO_CLASS;
+}
 
 function bOpts(ix="x", stacked=false){
   return{responsive:true,maintainAspectRatio:false,
@@ -402,13 +475,12 @@ function statRows(tbId, groups, stDict, cols){
 }
 
 const GRP=[["sucesso","Sucesso",C_SUC],["insucesso","Insucesso",C_INS]];
-
-// S1
 const motL=Object.keys(D.motivos), motV=Object.values(D.motivos);
+
 new Chart(document.getElementById("c-donut"),{
   type:"doughnut",
   data:{labels:motL,datasets:[{data:motV,
-    backgroundColor:motL.map(l=>l.includes("Sucesso")?C_SUC:l.includes("Insucesso")?C_INS:"#888780"),
+    backgroundColor:motL.map(colorMotivo),
     borderWidth:2,borderColor:"#fff"}]},
   options:{responsive:true,maintainAspectRatio:false,cutout:"60%",
     plugins:{legend:{position:"right",labels:{boxWidth:11,font:{size:11}}},
@@ -419,11 +491,10 @@ new Chart(document.getElementById("c-donut"),{
 new Chart(document.getElementById("c-motivos"),{
   type:"bar",
   data:{labels:motL,datasets:[{label:"Embriões",data:motV,borderRadius:3,
-    backgroundColor:motL.map(l=>l.includes("Sucesso")?C_SUC:l.includes("Insucesso")?C_INS:"#888780")}]},
+    backgroundColor:motL.map(colorMotivo)}]},
   options:{...bOpts("y"),plugins:{legend:{display:false}}}
 });
 
-// S2
 crossChart("c-unidade", D.unid_cross, "x");
 
 new Chart(document.getElementById("c-age"),{
@@ -484,7 +555,6 @@ new Chart(document.getElementById("c-asp"),{
 });
 statRows("tb-asp", GRP, D.asp_desc, ["n","media","dp","med"]);
 
-// S3 — morfocinética
 const mCols=D.morf_cols.filter(k=>D.morf_data[k]);
 const morfDesc={t2:"2 células",t3:"3 células",t4:"4 células",t5:"5 células",t8:"8 células",
   tB:"Blastulação",tEB:"Blast. expandido",tHB:"Blast. eclosão",tM:"Mórula",
@@ -514,7 +584,6 @@ mCols.forEach(k=>{
   tbM.appendChild(tr);
 });
 
-// S4 — morfologia
 crossChart("c-icm",   D.icm_cross,   "y");
 crossChart("c-te",    D.te_cross,    "y");
 crossChart("c-pn",    D.pn_cross,    "y");
