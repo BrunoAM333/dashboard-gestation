@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dashboard — Resultado Gestacional</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f6f5f2;--card:#fff;--border:#e0ddd4;--text:#18180f;--muted:#6b6960;
+  --suc:#0f6e56;--suc-lt:#e1f5ee;
+  --ins:#993c1d;--ins-lt:#faece7;
+  --blue:#185fa5;--amber:#854f0b;--amber-lt:#faeeda;
+  --r:10px;
+}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+      background:var(--bg);color:var(--text);font-size:13px;line-height:1.6;
+      padding:1.5rem 1.25rem 4rem}
+.wrap{max-width:1120px;margin:0 auto}
+.page-hdr{border-bottom:1px solid var(--border);padding-bottom:1rem;margin-bottom:1.75rem}
+.page-hdr h1{font-size:20px;font-weight:600;letter-spacing:-.3px}
+.page-hdr p{color:var(--muted);font-size:12px;margin-top:3px}
+.sec-nav{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:2rem}
+.sec-nav a{font-size:11px;padding:4px 10px;border:1px solid var(--border);
+            border-radius:20px;color:var(--muted);text-decoration:none;background:var(--card)}
+.sec-nav a:hover{background:var(--bg)}
+.sec-lbl{font-size:10px;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);
+          font-weight:600;margin:2rem 0 .6rem;padding-left:6px;border-left:3px solid var(--border)}
+.grid{display:grid;gap:.875rem}
+.g4{grid-template-columns:repeat(4,1fr)}
+.g3{grid-template-columns:repeat(3,1fr)}
+.g2{grid-template-columns:1fr 1fr}
+.g1{grid-template-columns:1fr}
+@media(max-width:860px){.g4,.g3{grid-template-columns:1fr 1fr}.g2{grid-template-columns:1fr}}
+@media(max-width:480px){.g4{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);
+       padding:1.1rem 1.3rem;box-shadow:0 1px 2px rgba(0,0,0,.05)}
+.card-t{font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);
+         font-weight:600;margin-bottom:.85rem}
+.kpi{padding:1rem 1.2rem}
+.kpi-lbl{font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:5px}
+.kpi-val{font-size:28px;font-weight:700;line-height:1}
+.kpi-sub{font-size:11px;color:var(--muted);margin-top:3px}
+.kpi.suc{border-left:3px solid var(--suc)}.kpi.ins{border-left:3px solid var(--ins)}
+.kpi.tot{border-left:3px solid var(--blue)}.kpi.amb{border-left:3px solid var(--amber)}
+.kpi.suc .kpi-val{color:var(--suc)}.kpi.ins .kpi-val{color:var(--ins)}
+.kpi.tot .kpi-val{color:var(--blue)}.kpi.amb .kpi-val{color:var(--amber)}
+.ch{position:relative;width:100%}.ch canvas{width:100%!important}
+.st{width:100%;border-collapse:collapse;font-size:12px;margin-top:.5rem}
+.st th{text-align:left;padding:5px 8px;background:var(--bg);color:var(--muted);
+        font-weight:500;border-bottom:1px solid var(--border)}
+.st td{padding:6px 8px;border-bottom:1px solid var(--border)}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;vertical-align:middle}
+.badge{display:inline-block;font-size:10px;padding:2px 7px;border-radius:4px;font-weight:500;margin:1px}
+.b-suc{background:var(--suc-lt);color:var(--suc)}.b-ins{background:var(--ins-lt);color:var(--ins)}
+.info-box{background:var(--bg);border-radius:6px;padding:.65rem .9rem;
+           font-size:11px;color:var(--muted);line-height:1.65;margin-top:.75rem}
+.taxa-card{display:flex;align-items:center;justify-content:space-between;
+            padding:.9rem 1.2rem;border-radius:var(--r);border:1px solid var(--border);
+            background:var(--card)}
+.taxa-pct{font-size:32px;font-weight:700}
+.taxa-lbl{font-size:12px;color:var(--muted);margin-top:2px}
+.met{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:1.5rem 1.75rem}
+.met h2{font-size:14px;font-weight:600;border-bottom:1px solid var(--border);padding-bottom:.5rem;margin-bottom:1rem}
+.met h3{font-size:12px;font-weight:600;margin:1rem 0 .3rem}
+.met p,.met li{font-size:12px;color:#3a3a38;line-height:1.7}
+.met ul{padding-left:1.1rem}
+section{scroll-margin-top:1rem}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="page-hdr">
+  <h1>Dashboard — Resultado Gestacional em Ciclos de FIV com PGT-A</h1>
+  <p>Análise de sucesso e insucesso gestacional. Base restrita a embriões efetivamente transferidos.
+     Dados agregados — nenhuma informação individual identificável.</p>
+</div>
+
+<nav class="sec-nav">
+  <a href="#s1">1 · Visão geral</a>
+  <a href="#s2">2 · Perfil das pacientes</a>
+  <a href="#s3">3 · Morfocinética</a>
+  <a href="#s4">4 · Morfologia embrionária</a>
+  <a href="#s5">5 · Metodologia</a>
+</nav>
+
+<!-- ══ S1 ══ -->
+<section id="s1">
+<div class="sec-lbl">1 · Visão geral do resultado gestacional</div>
+
+<div class="grid g4">
+  <div class="card kpi tot">
+    <div class="kpi-lbl">Total de embriões</div>
+    <div class="kpi-val" id="kv-tot"></div>
+    <div class="kpi-sub">na base completa</div>
+  </div>
+  <div class="card kpi amb">
+    <div class="kpi-lbl">Transferidos (análise)</div>
+    <div class="kpi-val" id="kv-transf"></div>
+    <div class="kpi-sub" id="ks-transf"></div>
+  </div>
+  <div class="card kpi suc">
+    <div class="kpi-lbl">Sucesso gestacional</div>
+    <div class="kpi-val" id="kv-suc"></div>
+    <div class="kpi-sub" id="ks-suc"></div>
+  </div>
+  <div class="card kpi ins">
+    <div class="kpi-lbl">Insucesso gestacional</div>
+    <div class="kpi-val" id="kv-ins"></div>
+    <div class="kpi-sub" id="ks-ins"></div>
+  </div>
+</div>
+
+<div class="grid g3" style="margin-top:.875rem">
+  <div class="taxa-card">
+    <div>
+      <div class="taxa-lbl">Taxa de sucesso geral</div>
+      <div class="taxa-pct" id="tv-geral" style="color:var(--suc)"></div>
+      <div class="taxa-lbl">dos transferidos</div>
+    </div>
+    <svg width="60" height="60" viewBox="0 0 36 36">
+      <circle cx="18" cy="18" r="15.9" fill="none" stroke="#e0ddd4" stroke-width="3"/>
+      <circle id="arc-geral" cx="18" cy="18" r="15.9" fill="none"
+              stroke="#0f6e56" stroke-width="3" stroke-dasharray="0 100"
+              stroke-linecap="round" transform="rotate(-90 18 18)"/>
+    </svg>
+  </div>
+  <div class="card" style="grid-column:span 2">
+    <div class="card-t">Distribuição da base completa por resultado</div>
+    <div class="ch" style="height:160px"><canvas id="c-donut"></canvas></div>
+  </div>
+</div>
+
+<div class="grid g1" style="margin-top:.875rem">
+  <div class="card">
+    <div class="card-t">Resultado gestacional por motivo de classificação</div>
+    <div class="ch" style="height:200px"><canvas id="c-motivos"></canvas></div>
+  </div>
+</div>
+</section>
+
+<!-- ══ S2 ══ -->
+<section id="s2">
+<div class="sec-lbl">2 · Perfil das pacientes — embriões transferidos</div>
+
+<div class="grid g1">
+  <div class="card">
+    <div class="card-t">Resultado gestacional por unidade clínica</div>
+    <div class="ch" style="height:240px"><canvas id="c-unidade"></canvas></div>
+  </div>
+</div>
+
+<div class="grid g2" style="margin-top:.875rem">
+  <div class="card">
+    <div class="card-t">Distribuição de idade materna por resultado</div>
+    <div class="ch" style="height:210px"><canvas id="c-age"></canvas></div>
+    <div class="info-box">A idade materna avançada reduz a receptividade endometrial e aumenta a taxa de aneuploidia oocitária, impactando diretamente o sucesso gestacional mesmo após PGT-A.</div>
+  </div>
+  <div class="card">
+    <div class="card-t">Estatísticas — idade materna (anos)</div>
+    <table class="st">
+      <thead><tr><th>Grupo</th><th>N</th><th>Média</th><th>DP</th><th>Mediana</th><th>Mín</th><th>Máx</th></tr></thead>
+      <tbody id="tb-age"></tbody>
+    </table>
+  </div>
+</div>
+
+<div class="grid g2" style="margin-top:.875rem">
+  <div class="card">
+    <div class="card-t">Distribuição de IMC por resultado</div>
+    <div class="ch" style="height:210px"><canvas id="c-bmi"></canvas></div>
+    <div class="info-box">Obesidade (IMC ≥ 30) está associada a alterações endometriais e hormonais que podem reduzir as taxas de implantação.</div>
+  </div>
+  <div class="card">
+    <div class="card-t">Estatísticas — IMC (kg/m²)</div>
+    <table class="st">
+      <thead><tr><th>Grupo</th><th>N</th><th>Média</th><th>DP</th><th>Mediana</th><th>Mín</th><th>Máx</th></tr></thead>
+      <tbody id="tb-bmi"></tbody>
+    </table>
+  </div>
+</div>
+
+<div class="grid g2" style="margin-top:.875rem">
+  <div class="card">
+    <div class="card-t">Transferências embrionárias anteriores por resultado</div>
+    <div class="ch" style="height:210px"><canvas id="c-prev"></canvas></div>
+    <div class="info-box">Maior número de tentativas prévias sem sucesso pode indicar fatores implantacionais recorrentes independentes da qualidade embrionária.</div>
+  </div>
+  <div class="card">
+    <div class="card-t">Diagnóstico materno — Sucesso vs. Insucesso (top 12)</div>
+    <div class="ch" style="height:210px"><canvas id="c-diag"></canvas></div>
+  </div>
+</div>
+
+<div class="grid g2" style="margin-top:.875rem">
+  <div class="card">
+    <div class="card-t">Origem do oócito por resultado</div>
+    <div class="ch" style="height:200px"><canvas id="c-src"></canvas></div>
+    <div class="info-box">Oócitos heterólogos (doação) costumam ser de pacientes mais jovens, podendo influenciar positivamente o resultado gestacional.</div>
+  </div>
+  <div class="card">
+    <div class="card-t">Histórico do oócito (fresco vs. descongelado) por resultado</div>
+    <div class="ch" style="height:200px"><canvas id="c-hist"></canvas></div>
+    <div class="info-box">A vitrificação de oócitos possui taxas de sobrevivência elevadas nos protocolos modernos, sem impacto significativo comprovado sobre o resultado gestacional.</div>
+  </div>
+</div>
+
+<div class="grid g2" style="margin-top:.875rem">
+  <div class="card">
+    <div class="card-t">Oócitos aspirados por ciclo</div>
+    <div class="ch" style="height:200px"><canvas id="c-asp"></canvas></div>
+  </div>
+  <div class="card" style="display:flex;flex-direction:column;justify-content:center">
+    <div class="card-t">Estatísticas — oócitos aspirados</div>
+    <table class="st">
+      <thead><tr><th>Grupo</th><th>N</th><th>Média</th><th>DP</th><th>Mediana</th></tr></thead>
+      <tbody id="tb-asp"></tbody>
+    </table>
+  </div>
+</div>
+</section>
+
+<!-- ══ S3 ══ -->
+<section id="s3">
+<div class="sec-lbl">3 · Morfocinética — parâmetros de desenvolvimento embrionário</div>
+
+<div class="card" style="margin-bottom:.875rem">
+  <p style="font-size:12px;color:var(--muted);line-height:1.7">
+    Comparação dos parâmetros morfocinéticos (tempo em horas após inseminação) entre embriões com
+    <span class="badge b-suc">sucesso</span> e <span class="badge b-ins">insucesso</span> gestacional,
+    obtidos pelo sistema de time-lapse (embrioscópio).
+    Diferenças podem indicar marcadores preditivos de implantação independentes da ploidia.
+  </p>
+</div>
+
+<div class="grid g1">
+  <div class="card">
+    <div class="card-t">Média dos parâmetros morfocinéticos — Sucesso vs. Insucesso (horas)</div>
+    <div class="ch" style="height:300px"><canvas id="c-morf"></canvas></div>
+  </div>
+</div>
+
+<div class="grid g1" style="margin-top:.875rem">
+  <div class="card">
+    <div class="card-t">Tabela detalhada — morfocinética (média ± DP, em horas)</div>
+    <div style="overflow-x:auto">
+    <table class="st">
+      <thead>
+        <tr>
+          <th>Parâmetro</th><th>Evento biológico</th>
+          <th style="color:var(--suc)">N Suc.</th>
+          <th style="color:var(--suc)">Média</th>
+          <th style="color:var(--suc)">DP</th>
+          <th style="color:var(--ins)">N Ins.</th>
+          <th style="color:var(--ins)">Média</th>
+          <th style="color:var(--ins)">DP</th>
+        </tr>
+      </thead>
+      <tbody id="tb-morf"></tbody>
+    </table>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ══ S4 ══ -->
+<section id="s4">
+<div class="sec-lbl">4 · Morfologia embrionária — parâmetros de qualidade</div>
+
+<div class="grid g2">
+  <div class="card">
+    <div class="card-t">ICM (Massa celular interna) por resultado</div>
+    <div class="ch" style="height:200px"><canvas id="c-icm"></canvas></div>
+    <div class="info-box">A = excelente · B = bom · C = moderado. ICM de maior qualidade está associado a melhor taxa de implantação.</div>
+  </div>
+  <div class="card">
+    <div class="card-t">TE (Trofoectoderme) por resultado</div>
+    <div class="ch" style="height:200px"><canvas id="c-te"></canvas></div>
+    <div class="info-box">TE avalia as células que originarão a placenta. Qualidade TE-A está associada a maior potencial de implantação e desenvolvimento placentário.</div>
+  </div>
+</div>
+
+<div class="grid g2" style="margin-top:.875rem">
+  <div class="card">
+    <div class="card-t">Pronúcleos (PN) por resultado</div>
+    <div class="ch" style="height:200px"><canvas id="c-pn"></canvas></div>
+    <div class="info-box">2 PN = fertilização normal. Desvios indicam fertilização anormal e podem comprometer o potencial de implantação.</div>
+  </div>
+  <div class="card">
+    <div class="card-t">Fragmentação-2 (categoria) por resultado</div>
+    <div class="ch" style="height:200px"><canvas id="c-frag2"></canvas></div>
+    <div class="info-box">Menor fragmentação celular no dia 2 está associada a melhor desenvolvimento e maior taxa de implantação.</div>
+  </div>
+</div>
+
+<div class="grid g2" style="margin-top:.875rem">
+  <div class="card">
+    <div class="card-t">Fragmentação — estatísticas descritivas</div>
+    <table class="st">
+      <thead><tr><th>Grupo</th><th>N</th><th>Média</th><th>DP</th><th>Mediana</th><th>Mín</th><th>Máx</th></tr></thead>
+      <tbody id="tb-frag"></tbody>
+    </table>
+  </div>
+</div>
+</section>
+
+<!-- ══ S5 ══ -->
+<section id="s5">
+<div class="sec-lbl">5 · Metodologia de classificação</div>
+<div class="met">
+  <h2>Como a classificação de resultado gestacional foi realizada</h2>
+
+  <h3>Fonte de dados</h3>
+  <p>Seis colunas foram utilizadas simultaneamente:
+  <strong>outcome_type</strong>, <strong>merged_numero_de_nascidos</strong>,
+  <strong>fet_gravidez_clinica</strong>, <strong>trat2_resultado_tratamento</strong>,
+  <strong>trat1_resultado_tratamento</strong> e <strong>fet_tipo_resultado</strong>.</p>
+
+  <h3>Base de análise</h3>
+  <p>Apenas embriões efetivamente transferidos foram incluídos na análise de resultado.
+  Embriões não transferidos (TERCEIRA VIA, FIV COMPLETA, Total Cryopreservation, Other)
+  recebem NaN em ambas as colunas e são excluídos — incluí-los distorceria as taxas
+  pois não participaram de uma tentativa de gestação naquele ciclo.</p>
+
+  <h3>Regras de classificação</h3>
+  <ul>
+    <li><strong><span class="badge b-suc">Sucesso (col_sucesso = 1):</span></strong>
+    qualquer sinal de gestação em qualquer coluna: POSITIVO, Delivery, NASCIMENTO,
+    Miscarriage, Gestação Clínica, Gestação Química, Gestação Química Confirmada,
+    BIOQUIMICA, Biochemical pregnancy, Clinical pregnancy.</li>
+    <li><strong><span class="badge b-ins">Insucesso (col_insucesso = 1):</span></strong>
+    NÃO ENGRAVIDOU, Negativo, No pregnancy (sem sinal de gestação associado).</li>
+    <li><strong>Não transferido → NaN:</strong>
+    TERCEIRA VIA, FIV COMPLETA, FIV INCOMPLETA, Total Cryopreservation, Other,
+    DUE TO ABNORMAL OR NO EMBRYO DEVELOPMENT, e linhas com apenas "No transfer".</li>
+  </ul>
+
+  <h3>Nota sobre gestação bioquímica</h3>
+  <p>Gestação bioquímica (BIOQUIMICA, Biochemical pregnancy) foi classificada como
+  <span class="badge b-suc">sucesso</span> pois representa implantação confirmada por β-hCG,
+  mesmo que sem evolução clínica. Isso segue a definição mais abrangente de sucesso gestacional
+  acordada para este estudo.</p>
+
+  <h3>Privacidade e segurança</h3>
+  <p>Este dashboard contém exclusivamente estatísticas agregadas geradas localmente.
+  Nenhum dado individual, identificador ou registro unitário foi incluído ou transmitido.</p>
+</div>
+</section>
+
+</div>
+<script>
+const D = {"total_base": 30930, "total_transf": 3380, "n_suc": 1321, "n_ins": 2059, "n_nao_transf": 18050, "n_sem_dados": 7235, "pct_suc": 39.1, "pct_ins": 60.9, "taxa_geral": 39.1, "motivos": {"Não transferido": 18050, "Sem dados": 7235, "Não classificado (revisar)": 2265, "Insucesso gestacional": 2059, "Sucesso gestacional": 1321}, "unid_cross": [{"cat": "Ibirapuera", "total": 1427, "suc": 476, "ins": 951}, {"cat": "Vila Mariana", "total": 976, "suc": 448, "ins": 528}, {"cat": "Brasilia", "total": 646, "suc": 251, "ins": 395}, {"cat": "Belo Horizonte", "total": 331, "suc": 146, "ins": 185}], "diag_cross": [{"cat": "Insuficiência ovariana", "total": 867, "suc": 258, "ins": 609}, {"cat": "Endometriose", "total": 558, "suc": 212, "ins": 346}, {"cat": "Fator masculino", "total": 476, "suc": 193, "ins": 283}, {"cat": "Outros", "total": 430, "suc": 189, "ins": 241}, {"cat": "Fator feminino anatômico", "total": 366, "suc": 111, "ins": 255}, {"cat": "Inexplicado", "total": 192, "suc": 80, "ins": 112}, {"cat": "Fator feminino endócrino", "total": 69, "suc": 35, "ins": 34}], "src_cross": [{"cat": "Homólogo", "total": 2205, "suc": 962, "ins": 1243}, {"cat": "Heterólogo", "total": 1174, "suc": 358, "ins": 816}, {"cat": "Ambos", "total": 1, "suc": 1, "ins": 0}], "hist_cross": [{"cat": "Fresco", "total": 2173, "suc": 1031, "ins": 1142}, {"cat": "Descongelado", "total": 1203, "suc": 286, "ins": 917}], "age_bins_lbl": [0.0, 5.1, 10.2, 15.2, 20.3, 25.4, 30.5, 35.6, 40.6, 45.7, 50.8, 55.9, 61.0, 66.0], "age_bins_suc": [5, 0, 0, 1, 0, 17, 127, 386, 502, 225, 42, 8, 3, 1], "age_bins_ins": [3, 0, 0, 0, 2, 47, 339, 785, 613, 228, 22, 14, 0, 3], "age_desc": {"sucesso": {"n": 1317, "media": 38.59, "dp": 5.33, "med": 38.51, "mn": 0.0, "mx": 65.86}, "insucesso": {"n": 2056, "media": 39.88, "dp": 5.37, "med": 39.43, "mn": 0.0, "mx": 71.13}}, "bmi_bins_lbl": [0.0, 19.0, 38.0, 56.9, 75.9, 94.9, 113.9, 132.8, 151.8, 170.8, 189.8, 208.8], "bmi_bins_suc": [42, 866, 3, 3, 0, 0, 0, 0, 0, 0, 0, 1], "bmi_bins_ins": [25, 0, 0, 0, 0, 188, 542, 499, 251, 88, 25, 12], "bmi_desc": {"sucesso": {"n": 915, "media": 23.94, "dp": 8.23, "med": 23.42, "mn": 0.0, "mx": 227.73}, "insucesso": {"n": 1630, "media": 23.69, "dp": 4.75, "med": 23.44, "mn": 0.0, "mx": 39.9}}, "prev_suc_vc": {"0": 1098, "1": 126, "2": 54, "4": 21, "3": 15, "5": 3, "6": 3, "7": 1}, "prev_ins_vc": {"0": 1488, "1": 325, "2": 113, "3": 75, "4": 24, "6": 10, "5": 9, "7": 6, "8": 3, "13": 2, "11": 2, "9": 1, "12": 1}, "asp_bins_lbl": [1.0, 7.2, 13.5, 19.8, 26.0, 32.2, 38.5, 44.8, 51.0, 57.2, 63.5, 69.8], "asp_bins_suc": [200, 615, 231, 120, 55, 21, 13, 1, 1, 0, 0, 2], "asp_bins_ins": [151, 539, 538, 213, 130, 61, 27, 7, 15, 13, 0, 3], "asp_desc": {"sucesso": {"n": 1259, "media": 13.5, "dp": 7.86, "med": 11.0, "mn": 1.0, "mx": 76.0}, "insucesso": {"n": 1697, "media": 11.94, "dp": 6.57, "med": 10.0, "mn": 1.0, "mx": 51.0}}, "morf_data": {"t2": {"suc_media": 26.0, "ins_media": 26.87, "suc_dp": 3.11, "ins_dp": 4.49, "suc_n": 1284, "ins_n": 1736}, "t3": {"suc_media": 36.65, "ins_media": 37.13, "suc_dp": 4.25, "ins_dp": 5.54, "suc_n": 1268, "ins_n": 1676}, "t4": {"suc_media": 38.07, "ins_media": 39.08, "suc_dp": 4.3, "ins_dp": 6.13, "suc_n": 1285, "ins_n": 1688}, "t5": {"suc_media": 49.45, "ins_media": 50.14, "suc_dp": 6.41, "ins_dp": 8.05, "suc_n": 1278, "ins_n": 1656}, "t8": {"suc_media": 57.9, "ins_media": 59.74, "suc_dp": 8.99, "ins_dp": 10.64, "suc_n": 1273, "ins_n": 1594}, "tB": {"suc_media": 104.59, "ins_media": 107.92, "suc_dp": 9.71, "ins_dp": 11.28, "suc_n": 1250, "ins_n": 1454}, "tEB": {"suc_media": 111.59, "ins_media": 115.04, "suc_dp": 9.48, "ins_dp": 11.32, "suc_n": 681, "ins_n": 690}, "tHB": {"suc_media": 115.65, "ins_media": 118.61, "suc_dp": 9.76, "ins_dp": 11.52, "suc_n": 441, "ins_n": 373}, "tM": {"suc_media": 88.99, "ins_media": 91.83, "suc_dp": 8.86, "ins_dp": 10.18, "suc_n": 412, "ins_n": 521}, "tPNa": {"suc_media": 7.45, "ins_media": 7.69, "suc_dp": 2.14, "ins_dp": 2.07, "suc_n": 418, "ins_n": 548}, "tPNf": {"suc_media": 23.53, "ins_media": 24.39, "suc_dp": 3.02, "ins_dp": 4.26, "suc_n": 1280, "ins_n": 1768}, "tSB": {"suc_media": 95.21, "ins_media": 98.01, "suc_dp": 8.52, "ins_dp": 9.76, "suc_n": 1253, "ins_n": 1492}, "tSC": {"suc_media": 78.54, "ins_media": 81.2, "suc_dp": 8.84, "ins_dp": 10.64, "suc_n": 413, "ins_n": 527}}, "morf_cols": ["t2", "t3", "t4", "t5", "t8", "tB", "tEB", "tHB", "tM", "tPNa", "tPNf", "tSB", "tSC"], "icm_cross": [{"cat": "A", "total": 1792, "suc": 921, "ins": 871}, {"cat": "B", "total": 749, "suc": 283, "ins": 466}, {"cat": "C", "total": 121, "suc": 31, "ins": 90}], "te_cross": [{"cat": "A", "total": 1420, "suc": 764, "ins": 656}, {"cat": "B", "total": 942, "suc": 377, "ins": 565}, {"cat": "C", "total": 299, "suc": 93, "ins": 206}], "frag2_cross": [{"cat": "0-10%", "total": 1009, "suc": 520, "ins": 489}, {"cat": "10-20%", "total": 319, "suc": 143, "ins": 176}, {"cat": "20-50%", "total": 66, "suc": 27, "ins": 39}, {"cat": "50-100%", "total": 3, "suc": 0, "ins": 3}], "pn_cross": [{"cat": "2.0", "total": 3116, "suc": 1298, "ins": 1818}, {"cat": "1.0", "total": 21, "suc": 1, "ins": 20}, {"cat": "0.0", "total": 19, "suc": 5, "ins": 14}, {"cat": "3.0", "total": 15, "suc": 1, "ins": 14}, {"cat": "4.0", "total": 3, "suc": 1, "ins": 2}], "frag_desc": {"sucesso": {"n": 385, "media": 27.97, "dp": 4.32, "med": 27.1, "mn": 20.0, "mx": 44.4}, "insucesso": {"n": 513, "media": 28.04, "dp": 5.13, "med": 26.9, "mn": 19.8, "mx": 74.9}}};
+const C_SUC="#0f6e56", C_INS="#993c1d", C_BLUE="#185fa5", C_AMB="#854f0b";
+
+document.getElementById("kv-tot").textContent    = D.total_base.toLocaleString("pt-BR");
+document.getElementById("kv-transf").textContent = D.total_transf.toLocaleString("pt-BR");
+document.getElementById("ks-transf").textContent = Math.round(D.total_transf/D.total_base*100)+"% da base";
+document.getElementById("kv-suc").textContent    = D.n_suc.toLocaleString("pt-BR");
+document.getElementById("ks-suc").textContent    = D.pct_suc+"% dos transferidos";
+document.getElementById("kv-ins").textContent    = D.n_ins.toLocaleString("pt-BR");
+document.getElementById("ks-ins").textContent    = D.pct_ins+"% dos transferidos";
+
+// Arco SVG
+document.getElementById("tv-geral").textContent = D.taxa_geral+"%";
+const circ = 2 * Math.PI * 15.9;
+document.getElementById("arc-geral").style.strokeDasharray =
+  `${(D.taxa_geral/100*circ).toFixed(1)} ${circ.toFixed(1)}`;
+
+function bOpts(ix="x", stacked=false){
+  return{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{labels:{boxWidth:11,font:{size:11}}}},
+    scales:{
+      x:{stacked,grid:{color:ix==="y"?"#f0ede6":"transparent"},ticks:{font:{size:11}}},
+      y:{stacked,grid:{color:ix==="x"?"#f0ede6":"transparent"},ticks:{font:{size:11}}}
+    },indexAxis:ix};
+}
+
+function crossChart(id, data, ix="y"){
+  new Chart(document.getElementById(id),{
+    type:"bar",
+    data:{labels:data.map(r=>r.cat),
+      datasets:[
+        {label:"Sucesso",  data:data.map(r=>r.suc),backgroundColor:C_SUC,borderRadius:3},
+        {label:"Insucesso",data:data.map(r=>r.ins),backgroundColor:C_INS,borderRadius:3},
+      ]},
+    options:bOpts(ix)
+  });
+}
+
+function statRows(tbId, groups, stDict, cols){
+  const tb=document.getElementById(tbId);
+  groups.forEach(([key,label,color])=>{
+    if(!stDict[key])return;
+    const st=stDict[key];
+    const tr=document.createElement("tr");
+    tr.innerHTML=`<td><span class="dot" style="background:${color}"></span>${label}</td>`
+      +cols.map(k=>`<td>${st[k]??"—"}</td>`).join("");
+    tb.appendChild(tr);
+  });
+}
+
+const GRP=[["sucesso","Sucesso",C_SUC],["insucesso","Insucesso",C_INS]];
+
+// S1
+const motL=Object.keys(D.motivos), motV=Object.values(D.motivos);
+new Chart(document.getElementById("c-donut"),{
+  type:"doughnut",
+  data:{labels:motL,datasets:[{data:motV,
+    backgroundColor:motL.map(l=>l.includes("Sucesso")?C_SUC:l.includes("Insucesso")?C_INS:"#888780"),
+    borderWidth:2,borderColor:"#fff"}]},
+  options:{responsive:true,maintainAspectRatio:false,cutout:"60%",
+    plugins:{legend:{position:"right",labels:{boxWidth:11,font:{size:11}}},
+              tooltip:{callbacks:{label:c=>`${c.label}: ${c.parsed.toLocaleString("pt-BR")} (${(c.parsed/D.total_base*100).toFixed(1)}%)`}}}
+  }
+});
+
+new Chart(document.getElementById("c-motivos"),{
+  type:"bar",
+  data:{labels:motL,datasets:[{label:"Embriões",data:motV,borderRadius:3,
+    backgroundColor:motL.map(l=>l.includes("Sucesso")?C_SUC:l.includes("Insucesso")?C_INS:"#888780")}]},
+  options:{...bOpts("y"),plugins:{legend:{display:false}}}
+});
+
+// S2
+crossChart("c-unidade", D.unid_cross, "x");
+
+new Chart(document.getElementById("c-age"),{
+  type:"bar",
+  data:{labels:D.age_bins_lbl.map(v=>v+" a"),
+    datasets:[
+      {label:"Sucesso",  data:D.age_bins_suc,backgroundColor:C_SUC+"bb",borderRadius:2},
+      {label:"Insucesso",data:D.age_bins_ins,backgroundColor:C_INS+"bb",borderRadius:2},
+    ]},
+  options:{...bOpts("x"),scales:{
+    x:{grid:{display:false},title:{display:true,text:"Idade (anos)",font:{size:11}}},
+    y:{grid:{color:"#f0ede6"},title:{display:true,text:"Nº embriões",font:{size:11}}}
+  }}
+});
+statRows("tb-age", GRP, D.age_desc, ["n","media","dp","med","mn","mx"]);
+
+new Chart(document.getElementById("c-bmi"),{
+  type:"bar",
+  data:{labels:D.bmi_bins_lbl.map(v=>v+""),
+    datasets:[
+      {label:"Sucesso",  data:D.bmi_bins_suc,backgroundColor:C_SUC+"bb",borderRadius:2},
+      {label:"Insucesso",data:D.bmi_bins_ins,backgroundColor:C_INS+"bb",borderRadius:2},
+    ]},
+  options:{...bOpts("x"),scales:{
+    x:{grid:{display:false},ticks:{maxRotation:40,font:{size:10}},
+       title:{display:true,text:"IMC (kg/m²)",font:{size:11}}},
+    y:{grid:{color:"#f0ede6"}}
+  }}
+});
+statRows("tb-bmi", GRP, D.bmi_desc, ["n","media","dp","med","mn","mx"]);
+
+const pKeys=[...new Set([...Object.keys(D.prev_suc_vc),...Object.keys(D.prev_ins_vc)])].sort((a,b)=>+a-+b);
+new Chart(document.getElementById("c-prev"),{
+  type:"bar",
+  data:{labels:pKeys.map(k=>"ET "+k),
+    datasets:[
+      {label:"Sucesso",  data:pKeys.map(k=>D.prev_suc_vc[k]||0),backgroundColor:C_SUC+"bb",borderRadius:2},
+      {label:"Insucesso",data:pKeys.map(k=>D.prev_ins_vc[k]||0),backgroundColor:C_INS+"bb",borderRadius:2},
+    ]},
+  options:bOpts("x")
+});
+
+crossChart("c-diag", D.diag_cross, "y");
+crossChart("c-src",  D.src_cross,  "y");
+crossChart("c-hist", D.hist_cross, "y");
+
+new Chart(document.getElementById("c-asp"),{
+  type:"bar",
+  data:{labels:D.asp_bins_lbl.map(v=>v+""),
+    datasets:[
+      {label:"Sucesso",  data:D.asp_bins_suc,backgroundColor:C_SUC+"bb",borderRadius:2},
+      {label:"Insucesso",data:D.asp_bins_ins,backgroundColor:C_INS+"bb",borderRadius:2},
+    ]},
+  options:{...bOpts("x"),scales:{
+    x:{grid:{display:false},title:{display:true,text:"Oócitos aspirados",font:{size:11}}},
+    y:{grid:{color:"#f0ede6"}}
+  }}
+});
+statRows("tb-asp", GRP, D.asp_desc, ["n","media","dp","med"]);
+
+// S3 — morfocinética
+const mCols=D.morf_cols.filter(k=>D.morf_data[k]);
+const morfDesc={t2:"2 células",t3:"3 células",t4:"4 células",t5:"5 células",t8:"8 células",
+  tB:"Blastulação",tEB:"Blast. expandido",tHB:"Blast. eclosão",tM:"Mórula",
+  tPNa:"PN aparecimento",tPNf:"PN desaparecimento",tSB:"Compactação",tSC:"1ª clivagem"};
+
+new Chart(document.getElementById("c-morf"),{
+  type:"bar",
+  data:{labels:mCols,
+    datasets:[
+      {label:"Sucesso",  data:mCols.map(k=>D.morf_data[k].suc_media),backgroundColor:C_SUC,borderRadius:3},
+      {label:"Insucesso",data:mCols.map(k=>D.morf_data[k].ins_media),backgroundColor:C_INS,borderRadius:3},
+    ]},
+  options:{...bOpts("x"),scales:{
+    x:{grid:{display:false}},
+    y:{grid:{color:"#f0ede6"},title:{display:true,text:"Horas após inseminação",font:{size:11}}}
+  }}
+});
+
+const tbM=document.getElementById("tb-morf");
+mCols.forEach(k=>{
+  const m=D.morf_data[k];
+  const tr=document.createElement("tr");
+  tr.innerHTML=`<td style="font-weight:500">${k}</td>
+    <td style="color:var(--muted);font-size:11px">${morfDesc[k]||""}</td>
+    <td>${m.suc_n}</td><td style="color:var(--suc)">${m.suc_media??"—"}</td><td>${m.suc_dp??"—"}</td>
+    <td>${m.ins_n}</td><td style="color:var(--ins)">${m.ins_media??"—"}</td><td>${m.ins_dp??"—"}</td>`;
+  tbM.appendChild(tr);
+});
+
+// S4 — morfologia
+crossChart("c-icm",   D.icm_cross,   "y");
+crossChart("c-te",    D.te_cross,    "y");
+crossChart("c-pn",    D.pn_cross,    "y");
+crossChart("c-frag2", D.frag2_cross, "y");
+statRows("tb-frag", GRP, D.frag_desc, ["n","media","dp","med","mn","mx"]);
+</script>
+</body>
+</html>
